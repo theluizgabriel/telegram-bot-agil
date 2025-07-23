@@ -1,25 +1,28 @@
 from fastapi import FastAPI
-from supabase import create_client, Client
 from fastapi.middleware.cors import CORSMiddleware
+from supabase import create_client
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()  # Carrega variáveis do .env
+# Caminho absoluto para o .env na raiz do projeto
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(env_path)  # Carrega o .env
 
 app = FastAPI()
 
-# Configurar CORS (para o frontend Angular)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:4200"],  # URL do Angular
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
-# Conexão com o Supabase
-supabase_url = os.getenv("SUPABASE_URL")
-supabase_key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(supabase_url, supabase_key)
+# Configuração do Supabase
+supabase = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_KEY")
+)
 
 # Rota para salvar mensagens (usada pelo bot)
 @app.post("/messages")
@@ -28,7 +31,7 @@ async def save_message(text: str, user_id: str):
         "text": text,
         "user_id": user_id
     }).execute()
-    return {"status": "Message saved!", "data": data}
+    return {"status": "Mensagem salva!", "data": data}
 
 # Rota para listar mensagens (usada pelo frontend)
 @app.get("/messages")

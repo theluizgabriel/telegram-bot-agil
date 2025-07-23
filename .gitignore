@@ -1,0 +1,12 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node/Angular
+node_modules/
+dist/
+
+# Ambiente
+.env
+.DS_Store
